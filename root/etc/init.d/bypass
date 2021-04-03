@@ -12,7 +12,7 @@ LOC=/var/lock/bypass.lock
 SDNS=/var/etc/smartdns
 DNS_T=$SDNS/smartdns.conf
 CON_T=$SDNS/rules.conf
-PID=/var/run/smartdns-le.pid
+PID=/var/run/smartdns.pid
 K=/tmp/bypass
 LOG=/var/log/bypass.log
 BIN_DIR=/usr/share/bypass
@@ -952,6 +952,11 @@ start_monitor(){
 }
 
 start(){
+	if [[ "$(uci get smartdns.@smartdns[0].enabled 2>/dev/null)" == "1" ]]; then
+		uci del smartdns.@smartdns[0].enabled 2>/dev/null
+		uci commit smartdns
+		/etc/init.d/smartdns stop 2>/dev/null
+	fi
 	touch $LOC
 	if [ -n "$switch_server" ];then
 		GLOBAL_SERVER=$switch_server
